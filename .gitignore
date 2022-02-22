@@ -16,3 +16,5 @@ generate_xml.py
 pt2.ipynb
 reconiz copy.ipynb
 
+*.avi
+*.mp4
