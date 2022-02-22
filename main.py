@@ -1,33 +1,24 @@
 
 from webcolors import rgb_percent_to_hex, hex_to_name, hex_to_rgb
-import matplotlib.pyplot as plt
-from IPython.display import clear_output
 import os
-from PIL import ImageGrab
 from darkflow.net.build import TFNet
-from IPython import get_ipython
 import time
 import cv2
 import numpy as np
 import numexpr as ne
-import face_recognition
 from collections import Counter
-from imutils import paths
 from multiprocessing.dummy import Pool as ThreadPool
 import threading
 import webcolors
 from sklearn.cluster import KMeans
 import pyttsx3
-import pickle
+# import pickle
 
-DATASET_FILE_NAME = 'model_encodings.pickle'
 FONT = cv2.FONT_HERSHEY_SIMPLEX
 
-get_ipython().run_line_magic('config', "InlineBackend.figure_format = 'svg'")
-
 options = {
-    'model': 'cfg/yolo.cfg',
-    'load': 'bin/yolo.weights',
+    'model': 'cfg/yolov2-tiny.cfg',
+    'load': 'bin/yolov2-tiny.weights',
     'threshold': 0.42,
     'gpu': 0.82
 }
@@ -43,7 +34,7 @@ MASK_COLOR = (0.0, 0.0, 1.0)  # In BGR format
 
 engine = pyttsx3.init()
 colors = [tuple(255 * np.random.rand(3)) for i in range(7)]
-data = pickle.loads(open(DATASET_FILE_NAME, "rb").read())
+# data = pickle.loads(open(DATASET_FILE_NAME, "rb").read())
 
 
 def predict(img):
@@ -91,30 +82,6 @@ object_with_colors = [
     'bottle',
     'laptop'
 ]
-
-
-def get_name(image):
-    boxes = face_recognition.face_locations(image, model='hop')
-    encodings = face_recognition.face_encodings(image, boxes)
-    # find faces
-    for encoding in encodings:
-        matches = face_recognition.compare_faces(data["encodings"], encoding)
-        num_prop = 0
-
-        if True in matches:
-            matchedIdxs = [i for (i, b) in enumerate(matches) if b]
-            counts = {}
-
-            for i in matchedIdxs:
-                name = data["names"][i]
-            name = max(counts, key=counts.get)
-            num_prop = counts[name] / num_names[name]
-
-            print("[INFO] detected %s with '%f' accuracy ..." %
-                  (name, num_prop))
-
-        return name if num_prop > 0.85 else "Unknown"
-    return None
 
 
 def fetchMetaInformation(result, image):
